@@ -19,6 +19,7 @@
 import math
 import numpy
 import operator
+import pickle
 
 # 测试数据集
 def createDataset():
@@ -156,9 +157,25 @@ def createTree(dataset, labels):
     return myTree
 
 
+def datasetFromFile(fileName):
+    fin=open(fileName)
+
+    resVec=[]
+    for vline in fin :
+        lVec=[item.strip() for item in vline.split("\t")]
+
+        resVec.append(lVec)
+
+    titles=['age','prescript', 'astigmatic','tearRate']
+
+    return resVec,titles
+
 
 def main():
-    dataset,labels=createDataset()
+    #dataset,labels=createDataset()
+    #myTree=createTree(dataset, labels)
+
+    dataset,labels=datasetFromFile('lenses.txt')
 
     myTree=createTree(dataset, labels)
 
