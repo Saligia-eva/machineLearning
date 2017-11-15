@@ -57,14 +57,11 @@ def trainNB0(trainMatrix, trainCategory):
 
     pAbusive=trainCategory.count(1)/float(numTraDocs) # 计算情感性语言概率
 
-    p0Num=numpy.zeros(numWords)
-    p1Num=numpy.zeros(numWords)
+    p0Num=numpy.ones(numWords)
+    p1Num=numpy.ones(numWords)
 
-    print(p0Num)
-    print(p1Num)
-
-    p0Denom=0.0
-    p1Denom=0.0
+    p0Denom=2.0
+    p1Denom=2.0
 
     # 计算每个类别下每个的词频
     for i in range(numTraDocs):
@@ -76,16 +73,32 @@ def trainNB0(trainMatrix, trainCategory):
             p0Denom += sum(trainMatrix[i])
 
     # 计算每个单词出现的概率
-    p1Vect = p1Num/p1Denom
-    p0Vect = p0Num/p0Denom
+    p1Vect = numpy.log(p1Num/p1Denom)
+    p0Vect = numpy.log(p0Num/p0Denom)
 
     return p0Vect,p1Vect,pAbusive
 
 def classifyNB(vec2Classify, p0Vec, p1Vec, pClass):
-    p1 = sum(vec2Classify * p1Vec) + math.log(pClass)
-    p0 = sum(vec2Classify * p0Vec) + math.log(1- pClass)
+    # print("p0 : " +str(p0Vec))
+    # print("p1 : " + str(p1Vec))
+    # print("vec : " + str(vec2Classify))
 
-    if p1 > 0:
+    """
+    p0Vec : A 类语言的词频概率
+    p1Vec : B 类语言的词频概率
+    """
+
+    ### ??
+    print(numpy.sum(vec2Classify * p1Vec))
+    print(math.log(pClass))
+    
+    p1 = numpy.sum(vec2Classify * p1Vec) + math.log(pClass)
+    p0 = numpy.sum(vec2Classify * p0Vec) + math.log(1- pClass)
+
+    print(p1)
+    print(p0)
+
+    if p1 > p0:
         return 1
     else:
         return 0
@@ -96,7 +109,7 @@ def main():
 
     #收集所有的词汇
     myVocabList=createVocabList(database)
-    #res = setOfWords2Vec(myVocabList, database[0])
+
     trainMat = []
 
     for postinDoc in database:
@@ -108,7 +121,6 @@ def main():
     testEntry = ['stupid', 'garbage']
 
     thisDoc = numpy.array(setOfWords2Vec(myVocabList, testEntry))
-
     print(testEntry,'classified as : ' , classifyNB(thisDoc, p0V, p1V, pAb))
 
 
