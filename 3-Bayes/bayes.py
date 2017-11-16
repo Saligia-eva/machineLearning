@@ -1,11 +1,24 @@
 #!/usr/bin/evn python
 # -*- coding:utf8 -*-
 
-################################
+####################################################################
 # 构建单词向量:
 #      0 : 情感类评论
 #      1 : 中性言论
-#################################
+#
+#  核心算法思想:
+#
+#      -> 首先是提取出所有的文件中出现的词汇构建词库
+#      -> 然后计算在每一种分类中每一个词汇所占有的概率
+#
+#      -> 当给未知的内容分类时， 将新的未知的词汇统计，并计算出现这种词汇，在两种类别中的概率
+#      -> 概率加和 [出现这个词汇 或者 出现那个的概率]
+#
+#  问题:
+#      -> 比对的库向量比较大，就算出现少量的词汇，也要与整张表进行比对
+#
+#
+######################################################################
 
 import numpy
 import math
@@ -79,9 +92,6 @@ def trainNB0(trainMatrix, trainCategory):
     return p0Vect,p1Vect,pAbusive
 
 def classifyNB(vec2Classify, p0Vec, p1Vec, pClass):
-    # print("p0 : " +str(p0Vec))
-    # print("p1 : " + str(p1Vec))
-    # print("vec : " + str(vec2Classify))
 
     """
     p0Vec : A 类语言的词频概率
@@ -91,7 +101,7 @@ def classifyNB(vec2Classify, p0Vec, p1Vec, pClass):
     ### ??
     print(numpy.sum(vec2Classify * p1Vec))
     print(math.log(pClass))
-    
+
     p1 = numpy.sum(vec2Classify * p1Vec) + math.log(pClass)
     p0 = numpy.sum(vec2Classify * p0Vec) + math.log(1- pClass)
 
