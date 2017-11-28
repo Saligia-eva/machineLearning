@@ -9,7 +9,6 @@ def textParse(bigString):
 
     listItem = re.split(r'\W', bigString)
     listItem = [vItem.lower() for vItem in listItem if len(vItem) > 2]
-
     #print(listItem)
     return listItem
 

@@ -37,8 +37,7 @@ def  gradientFunc():
     x= np.linspace(1,2,10)
     y= np.linspace(2,4,10)
 
-    plt.plot(x,y)
-    
+
     plt.show()
 
 def main():
