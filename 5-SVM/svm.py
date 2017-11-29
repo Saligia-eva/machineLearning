@@ -2,6 +2,8 @@
 #-*- coding:utf8 -*-
 
 import random
+import numpy
+from numpy import *
 
 def loadDataSet(fileName):
     dataMat = []
@@ -14,6 +16,9 @@ def loadDataSet(fileName):
 
         dataMat.append([float(lineArr[0]), float(lineArr[1])])  # 向量参数
         labelMat.append(float(lineArr[2]))                    # 标签
+
+    #dataMat = numpy.mat(dataMat).reshape(2,-1)
+    #labelMat = numpy.mat(labelMat)
 
     return dataMat, labelMat
 
@@ -30,7 +35,7 @@ def selectJrand(i,m):
 
     return j
 
-def cliAlpha(aj, H, L):
+def clipAlpha(aj, H, L):
 
     if aj > H :
         aj = H
@@ -39,15 +44,79 @@ def cliAlpha(aj, H, L):
 
     return aj
 
+##
+# 简化版 SMO 算法
+##
+# def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
+#     b = 0
+#     m,n  = dataMatIn.shape
+#
+#     alpha = numpy.ones((1,m))  # 构建参数列表
+#     iter = 0
+#     #
+#     # while iter < maxIter :
+#     #     alphaPairsChanged = 0
+#     #
+#     #     for i in range(n):
+#     #         fXi = float(numpy.multiply)
+
+
 def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
-    
+    dataMatrix = mat(dataMatIn);
+    labelMat = mat(classLabels).transpose()
+    b = 0; m,n = shape(dataMatrix)
 
+    # m 为记录数量
+    # n 为维度个数
 
+    alphas = mat(zeros((m,1)))
+    print(multiply(alphas,labelMat))
+    iter = 0
+    while (iter < maxIter):
+        alphaPairsChanged = 0
+        for i in range(m):
+            # label * (m_n * n_1[取出特定列--所有记录的特定维度]) -> 某个记录的所有维度的求值
+
+            fXi = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
+
+            Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
+
+            if ((labelMat[i]*Ei < -toler) and (alphas[i] < C)) or ((labelMat[i]*Ei > toler) and (alphas[i] > 0)):
+                j = selectJrand(i,m)
+                fXj = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[j,:].T)) + b
+                Ej = fXj - float(labelMat[j])
+                alphaIold = alphas[i].copy(); alphaJold = alphas[j].copy();
+                if (labelMat[i] != labelMat[j]):
+                    L = max(0, alphas[j] - alphas[i])
+                    H = min(C, C + alphas[j] - alphas[i])
+                else:
+                    L = max(0, alphas[j] + alphas[i] - C)
+                    H = min(C, alphas[j] + alphas[i])
+                if L==H: print "L==H"; continue
+                eta = 2.0 * dataMatrix[i,:]*dataMatrix[j,:].T - dataMatrix[i,:]*dataMatrix[i,:].T - dataMatrix[j,:]*dataMatrix[j,:].T
+                if eta >= 0: print "eta>=0"; continue
+                alphas[j] -= labelMat[j]*(Ei - Ej)/eta
+                alphas[j] = clipAlpha(alphas[j],H,L)
+                if (abs(alphas[j] - alphaJold) < 0.00001): print "j not moving enough"; continue
+                alphas[i] += labelMat[j]*labelMat[i]*(alphaJold - alphas[j])#update i by the same amount as j
+                                                                        #the update is in the oppostie direction
+                b1 = b - Ei- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[i,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[i,:]*dataMatrix[j,:].T
+                b2 = b - Ej- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[j,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[j,:]*dataMatrix[j,:].T
+                if (0 < alphas[i]) and (C > alphas[i]): b = b1
+                elif (0 < alphas[j]) and (C > alphas[j]): b = b2
+                else: b = (b1 + b2)/2.0
+                alphaPairsChanged += 1
+                print "iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged)
+        if (alphaPairsChanged == 0): iter += 1
+        else: iter = 0
+        print "iteration number: %d" % iter
+    return b,alphas
 
 def main():
     dataMat, labelMat = loadDataSet('testSet.txt')
 
-    print(labelMat)
+    smoSimple(dataMat, labelMat, 0.6, 0.001, 1)
+
 
 
 if __name__ == '__main__':
