@@ -25,17 +25,18 @@ def loadDataSet(fileName):
     return dataMat, labelMat
 
 ##
+# 回去 aj 的下标
 #
-# i : 第一个 alpha 的下标, m 是所有 alpha 的数据
 ##
 def selectJrand(i,m):
-    j = i
-
+    j = 1
     while j == i:
         j = int(random.uniform(0, m))
-
     return j
 
+###
+#
+###
 def clipAlpha(aj, H, L):
 
     if aj > H :
@@ -55,29 +56,9 @@ def clipAlpha(aj, H, L):
      如果两个向量都不能被优化,退出循环
 如果所有的数据向量都没被优化，增加迭代次数，继续下一次循环
 """
-##
-# 简化版 SMO 算法
-##
-def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
-
-    print(dataMatIn)
-    print(classLabels)
-
-    # 后期计算吧
-    b = 0;
-    # m : 维度
-    # n : 记录数
-    m,n = dataMatIn.shape
-
-    print(m,n)
-    alphas = mat(zeros((m,1)))
-    """
-    iter = 0
+##    iter = 0
     while (iter < maxIter):
         alphaPairsChanged = 0
-        for i in range(m):
-            # 求
-            fXi = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
 
             Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
 
