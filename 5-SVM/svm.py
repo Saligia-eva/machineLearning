@@ -3,8 +3,10 @@
 
 import random
 import numpy
-from numpy import *
 
+##
+# 加载数据集合
+##
 def loadDataSet(fileName):
     dataMat = []
     labelMat= []
@@ -15,20 +17,19 @@ def loadDataSet(fileName):
         lineArr = line.strip().split('\t')
 
         dataMat.append([float(lineArr[0]), float(lineArr[1])])  # 向量参数
-        labelMat.append(float(lineArr[2]))                    # 标签
+        labelMat.append(float(lineArr[2]))                      # 标签
 
-    #dataMat = numpy.mat(dataMat).reshape(2,-1)
-    #labelMat = numpy.mat(labelMat)
+    dataMat = numpy.mat(dataMat).reshape(2,-1)
+    labelMat = numpy.mat(labelMat)
 
     return dataMat, labelMat
 
 ##
 #
 # i : 第一个 alpha 的下标, m 是所有 alpha 的数据
-#
 ##
 def selectJrand(i,m):
-    j = 1
+    j = i
 
     while j == i:
         j = int(random.uniform(0, m))
@@ -44,39 +45,38 @@ def clipAlpha(aj, H, L):
 
     return aj
 
+"""
+创建 alpha 向量并将其初始化为 0 向量
+当迭代次数小于最大迭代次数时(外循环)
+   对数据集中的每个数据向量(内向量)
+    如果该数据向量可以被优化：
+     随机选择另外一个数据向量
+     同时优化这两个数据向量
+     如果两个向量都不能被优化,退出循环
+如果所有的数据向量都没被优化，增加迭代次数，继续下一次循环
+"""
 ##
 # 简化版 SMO 算法
 ##
-# def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
-#     b = 0
-#     m,n  = dataMatIn.shape
-#
-#     alpha = numpy.ones((1,m))  # 构建参数列表
-#     iter = 0
-#     #
-#     # while iter < maxIter :
-#     #     alphaPairsChanged = 0
-#     #
-#     #     for i in range(n):
-#     #         fXi = float(numpy.multiply)
-
-
 def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
-    dataMatrix = mat(dataMatIn);
-    labelMat = mat(classLabels).transpose()
-    b = 0; m,n = shape(dataMatrix)
 
-    # m 为记录数量
-    # n 为维度个数
+    print(dataMatIn)
+    print(classLabels)
 
+    # 后期计算吧
+    b = 0;
+    # m : 维度
+    # n : 记录数
+    m,n = dataMatIn.shape
+
+    print(m,n)
     alphas = mat(zeros((m,1)))
-    print(multiply(alphas,labelMat))
+    """
     iter = 0
     while (iter < maxIter):
         alphaPairsChanged = 0
         for i in range(m):
-            # label * (m_n * n_1[取出特定列--所有记录的特定维度]) -> 某个记录的所有维度的求值
-
+            # 求
             fXi = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
 
             Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
@@ -111,13 +111,12 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
         else: iter = 0
         print "iteration number: %d" % iter
     return b,alphas
-
+    """
 def main():
     dataMat, labelMat = loadDataSet('testSet.txt')
 
-    smoSimple(dataMat, labelMat, 0.6, 0.001, 1)
-
-
+    #print(labelMat)
+    smoSimple(dataMat, labelMat, 0.6, 0.001, 40)
 
 if __name__ == '__main__':
     main()
