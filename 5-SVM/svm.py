@@ -56,10 +56,31 @@ def clipAlpha(aj, H, L):
      如果两个向量都不能被优化,退出循环
 如果所有的数据向量都没被优化，增加迭代次数，继续下一次循环
 """
-##    iter = 0
+##
+# 简化版 SMO 算法
+##
+def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
+
+    print(dataMatIn)
+    print(classLabels)
+
+    # 后期计算吧
+    b = 0;
+    # m : 维度
+    # n : 记录数
+    m,n = dataMatIn.shape
+
+    print(m,n)
+    alphas = mat(zeros((m,1)))
+    """
+
+    iter = 0
     while (iter < maxIter):
         alphaPairsChanged = 0
-
+        for i in range(n):
+            # label * (m_n * n_1[取出特定列--所有记录的特定维度]) -> 某个记录的所有维度的求值
+            # 计算预测类别
+            fXi = float(numpy.multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
             Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
 
             if ((labelMat[i]*Ei < -toler) and (alphas[i] < C)) or ((labelMat[i]*Ei > toler) and (alphas[i] > 0)):
@@ -93,11 +114,13 @@ def clipAlpha(aj, H, L):
         print "iteration number: %d" % iter
     return b,alphas
     """
+
 def main():
     dataMat, labelMat = loadDataSet('testSet.txt')
 
     #print(labelMat)
     smoSimple(dataMat, labelMat, 0.6, 0.001, 40)
+
 
 if __name__ == '__main__':
     main()
